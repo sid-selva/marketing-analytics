@@ -114,7 +114,7 @@ table_views %>% head() %>%
 image(rating_matrix[1:20, 1:25], axes = FALSE, main = "Heatmap of the first 25 rows and 25 columns")
 
 
-# Selecting and Prepraing the Data 
+# Selecting and Preparing the Data 
 
 movie_ratings <- rating_matrix[rowCounts(rating_matrix) > 50,
                               colCounts(rating_matrix) > 50]
