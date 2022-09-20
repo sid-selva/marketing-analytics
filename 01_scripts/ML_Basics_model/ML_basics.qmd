@@ -1,0 +1,193 @@
+---
+title: "Coursera AI Product Management: Final Project"
+subtitle: "Combined Cycle Power Plant"
+format: html
+warning: false
+---
+
+
+```{r}
+#| warning: false
+library(tidyverse)
+library(tidymodels)
+
+library(parsnip)
+
+library(correlationfunnel)
+
+# Pre processing & Sampling
+library(recipes)
+library(rsample)
+
+library(yardstick)
+```
+
+### Read Data in to RStudio
+```{r}
+tbl <- read_csv(file = "ML_basics_files/CCPP_data.csv")
+
+dim(tbl)
+
+```
+
+Head of Data 
+```{r}
+head(tbl,n = 10) %>% knitr::kable()
+```
+
+The Data has four features to predict the target variable (PE) which is the hourly electrical output.
+
+Check for Missing Values
+
+```{r}
+library(DataExplorer)
+
+introduce(tbl) %>% knitr::kable()
+
+```
+
+```{r}
+GGally::ggpairs(tbl)
+```
+
+### Plot Correlation Funnel 
+
+```{r}
+tbl %>% correlate(target = PE) %>% plot_correlation_funnel(interactive = TRUE)
+```
+
+Prep the data for Modeling 
+
+```{r}
+
+set.seed(1113)
+ 
+split_obj <- rsample::initial_split(data = tbl,prop = 0.8)
+
+train_tbl <- training(split_obj)
+test_tbl <- testing(split_obj)
+
+dim(train_tbl)
+dim(test_tbl)
+
+```
+
+This is a regression problem, we have to build a model to predict the PF value , considering AT and V are heavily correlated with the target variable, they can have an significant influence in the model. 
+
+Model 1 Linear Regression with all 4 Features
+```{r}
+model_01_linear_lm_simple <- linear_reg(mode = "regression") %>% 
+    set_engine("lm") %>% 
+    fit(PE ~ ., data = train_tbl)
+
+summary(model_01_linear_lm_simple)
+```
+
+
+```{r}
+model_01_linear_lm_simple$fit %>% 
+    broom::tidy() %>% 
+    arrange(p.value) %>% 
+    mutate(term = as_factor(term) %>% fct_rev()) %>% knitr::kable(digits = 5)
+```
+
+MODEL 2 , Linear Regression with Selected Features
+```{r}
+
+model_02_linear_lm_simple <- linear_reg(mode = "regression") %>% 
+    set_engine("lm") %>% 
+    fit(PE ~ AT + AP + RH, data = train_tbl)
+
+```
+
+Model Summary 
+```{r}
+
+model_02_linear_lm_simple$fit %>% 
+    broom::tidy() %>% 
+    arrange(p.value) %>% 
+    mutate(term = as_factor(term) %>% fct_rev()) %>% knitr::kable(digits = 5)
+
+```
+
+### Penalised Regression , Mixture = 0, Ridge
+
+```{r}
+
+model_03_linear_glmnet <- linear_reg(mode = "regression", penalty = 5, mixture = 0) %>% 
+    set_engine("glmnet") %>% 
+    fit(PE ~ .,data = train_tbl)
+
+```
+
+```{r}
+model_03_linear_glmnet$fit %>% 
+    broom::tidy() %>% 
+    filter(dev.ratio == max(dev.ratio)) %>%  
+    # Changes in Parsnip, multiple steps now calculated
+    arrange(desc(estimate)) %>% 
+    mutate(term = as_factor(term) %>% fct_rev()) %>% drop_na()
+```
+
+Final Model , Lasso , Mixture = 1
+
+```{r}
+model_04_linear_glmnet <- linear_reg(mode = "regression", penalty = 5, mixture = 1) %>% 
+    set_engine("glmnet") %>% 
+    fit(PE ~ .,data = train_tbl)
+
+```
+
+Model Metrics
+
+```{r}
+model_04_linear_glmnet$fit %>% 
+    broom::tidy() %>% 
+    filter(dev.ratio == max(dev.ratio)) %>%  
+    # Changes in Parsnip, multiple steps now calculated
+    arrange(desc(estimate)) %>% 
+    mutate(term = as_factor(term) %>% fct_rev()) %>% drop_na()
+```
+
+### Output Metrics 
+
+Model 1 Linear Regression 
+
+```{r}
+model_01_linear_lm_simple %>% 
+    predict(new_data = test_tbl) %>% 
+    
+    bind_cols(test_tbl %>% select(PE)) %>% 
+    yardstick::metrics(truth = PE , estimate = .pred)%>% knitr::kable(digits = 5)
+```
+
+Model 2 Linear Regression , 3 Features
+
+```{r}
+model_02_linear_lm_simple %>% 
+    predict(new_data = test_tbl) %>% 
+    
+    bind_cols(test_tbl %>% select(PE)) %>% 
+    yardstick::metrics(truth = PE , estimate = .pred)%>% knitr::kable(digits = 5)
+```
+Model 3, GLMNET Penalized Linear Regression , Ridge
+
+```{r}
+model_03_linear_glmnet %>% 
+    predict(new_data = test_tbl) %>% 
+    
+    bind_cols(test_tbl %>% select(PE)) %>% 
+    yardstick::metrics(truth = PE , estimate = .pred)%>% knitr::kable(digits = 5)
+
+```
+
+Model 3, GLMNET Penalized Linear Regression , Lasso
+
+```{r}
+model_04_linear_glmnet %>% 
+    predict(new_data = test_tbl) %>% 
+    
+    bind_cols(test_tbl %>% select(PE)) %>% 
+    yardstick::metrics(truth = PE , estimate = .pred)%>% knitr::kable(digits = 5)
+```
+
