@@ -1,0 +1,71 @@
+---
+title: "ML Systems"
+subtitle: "AI Project Management Course 2 - Coursera Project"
+format: revealjs
+date: 09/26/2022
+date-format: long
+---
+
+## Opportunity 
+
+- Build A Probabilistic ML model to Assist option pricing 
+- The odds are rapidly changing with change in macro environment, 
+- Quantifying Risk would assist to make better decisions 
+
+
+## CRISP-DM Business Understanding #1 
+
+
+- Business Understanding: 
+  - Success: Understand the Outcome, Better Trading Profit 
+- Data Understanding 
+  - Identify the Data and labels 
+- Data Preparation 
+  - Classify Trades on Options, and flag profit from trades 
+  
+## CRISP-DM Business Understanding #2
+
+- Modeling 
+  - Numerical Model, with many One-hot features
+- Evaluation 
+  - Probabilistic Ranking of outcomes 
+- Deployment 
+  - Put the Model in to Production and use it with Real Data. GCP with Database integrated
+  
+
+## Solution 
+
+The Model will identify the optimum price for the Option.
+<BR>
+Considering,
+
+  - Time Series Price Prediction of the underlying Asset 
+  - Economic Indicators, Interest rate, Spending Index etc
+  - lagged Price to indicate seasonality
+  
+## Data & Validation 
+
+- The model would need data of the previous trades.
+
+- Input data should be monitored, for structural balance,
+
+  - Imbalance in the input could result in biased outcomes.
+  
+- More than the Model Validation Metrics, profit should be used for Validation
+
+## ML System Design 
+
+- Cloud System 
+- Online learning 
+- Online Prediction 
+
+Based on Traders' Real time needs the System and UI should be lean
+
+
+## Risks 
+
+- Short Term Cyclic Trends  
+- Economic Shifts, Past looking data could miss potential Shifts
+
+
+

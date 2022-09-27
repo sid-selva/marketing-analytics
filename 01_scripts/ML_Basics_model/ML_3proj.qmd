@@ -1,0 +1,39 @@
+---
+title: "Human Factors in AI "
+subtitle: "AI Project Management Course 3 - Coursera Project"
+format: revealjs
+date: 09/27/2022
+date-format: long
+---
+
+## Solution 
+
+A ML inspired Option Pricing Workflow for Traders.
+
+Adds value to the fast paced trading floor.
+
+## Task Analysis 
+
+- Traders need information about the Dependencies of the Prices in Real time 
+- They Interact and study the relationship among the variables
+
+## User Experience Design 
+
+- Visual Interface
+- UI similar to trading tools , such as Bloomberg etc
+- User Input: In form of Notes and Pins
+- Integrated in to Current Pricing/ Trading Work flow
+
+## Privacy 
+
+- The Information of the Trade won't be measured or observed.
+- Market Data will be available to All
+
+## Ethics 
+
+- The objective is to equip the user with better decision tools 
+- Not to Influence the user in to getting in to a trade
+- Ethical AI
+  - Fairness: It doesn't work on its own, just augments the Trader
+  - Accountability: Human Accountability, ML Decision Support
+  - Transparency: Transparent of the Model Process 
